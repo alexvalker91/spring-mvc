@@ -6,10 +6,14 @@ import alex.valker91.spring_boot.service.EventService;
 import alex.valker91.spring_boot.service.TicketService;
 import alex.valker91.spring_boot.service.UserAccountService;
 import alex.valker91.spring_boot.service.UserService;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@EnableJpaRepositories(basePackages = "alex.valker91.spring_boot.repository")
+@EntityScan(basePackages = "alex.valker91.spring_boot.entity")
 public class AppConfig {
 
     @Bean

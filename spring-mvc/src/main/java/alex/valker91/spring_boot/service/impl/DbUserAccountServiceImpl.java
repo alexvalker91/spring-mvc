@@ -25,7 +25,7 @@ public class DbUserAccountServiceImpl implements UserAccountService {
 
     @Override
     public int refillUserAccount(long userId, int amount) {
-        Optional<UserAccountDb> userAccountDbOptional = dbUserAccountRepository.findById(userId);
+        Optional<UserAccountDb> userAccountDbOptional = dbUserAccountRepository.findByUserId(userId);
         if (userAccountDbOptional.isPresent()) {
             UserAccountDb userAccountDb = userAccountDbOptional.get();
             userAccountDb.setAmount(userAccountDb.getAmount() + amount);
@@ -40,7 +40,7 @@ public class DbUserAccountServiceImpl implements UserAccountService {
 
     @Override
     public UserAccount getUserAccountByUserId(long userId) {
-        Optional<UserAccountDb> userAccountDbOptional = dbUserAccountRepository.findById(userId);
+        Optional<UserAccountDb> userAccountDbOptional = dbUserAccountRepository.findByUserId(userId);
         if (userAccountDbOptional.isPresent()) {
             UserAccountDb userAccountDb = userAccountDbOptional.get();
             LOGGER.log(Level.DEBUG, "User with id {} successfully found ", userId);
