@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ивенты</title>
+</head>
+<body>
+<a data-th-href="@{/users/main/page}">&larr; К Основной Странице Пользователей</a>
+<h1>Новый Пользователь</h1>
+<div data-th-if="${errors}">
+    <h2>Допущены ошибки</h2>
+    <ul>
+        <li data-th-each="error: ${errors}" data-th-text="${error}"></li>
+    </ul>
+</div>
+<form method="post" data-th-action="@{/users/create}">
+    <label>
+        Id:<br>
+        <input type="number" name="id" data-th-value="${payload?.id}">
+    </label><br>
+    <label>
+        Name:<br>
+        <input type="text" name="name" data-th-value="${payload?.name}">
+    </label><br>
+    <label>
+        Email:<br>
+        <input type="text" name="email" data-th-value="${payload?.email}">
+    </label><br>
+    <button type="submit">Создать</button>
+</form>
+</body>
+</html>

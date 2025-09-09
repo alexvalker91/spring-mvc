@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Пользователи</title>
+</head>
+<body>
+<a data-th-href="@{/users/create}">+ Создать пользователя</a>
+<form method="get" data-th-action="@{/users/userbyemail}">
+    <label>Фильтр:<input type="text" name="filter" data-th-value="${filter}">
+        <button type="submit">Поиск</button>
+    </label>
+</form>
+<table>
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Пользователи</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ul>
+        <li><strong>ID</strong>: <span data-th-text="${user.id}"></span></li>
+        <li><strong>Имя</strong>: <span data-th-text="${user.name}"></span></li>
+        <li><strong>Емейл</strong>: <span data-th-text="${user.email}"></span></li>
+    </ul>
+    </tbody>
+</table>
+</body>
+</html>

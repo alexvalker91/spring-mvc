@@ -77,8 +77,8 @@ public class DbUserServiceImpl implements UserService {
         }
         UserDb userDb = mapUserToUserDb(user);
         userDb.setId(null);
-        this.dbUserRepository.save(userDb);
-        return user;
+        userDb = this.dbUserRepository.save(userDb);
+        return mapUserDbToUser(userDb);
     }
 
     @Override

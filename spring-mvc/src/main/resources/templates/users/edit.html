@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ивент</title>
+</head>
+<body>
+<a data-th-href="@{/users/{userId}(userId=${user.id})}">&larr; К Ивенту</a>
+<h1 data-th-text="${user.name}"></h1>
+<div data-th-if="${errors}">
+    <h2>Допущены ошибки</h2>
+    <ul>
+        <li data-th-each="error: ${errors}" data-th-text="${error}"></li>
+    </ul>
+</div>
+<form method="post" data-th-action="@{/users/{userId}/edit(userId=${user.id})}">
+    <label>
+        Имя:<br>
+        <input type="text" name="name" data-th-value="${payload != null ? payload.name : user.name}">
+    </label><br>
+    <button type="submit">Изменить</button>
+</form>
+</body>
+</html>
