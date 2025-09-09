@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ивент</title>
+</head>
+<body>
+<a data-th-href="@{/events/main/page}">&larr; К Основной Странице Ивентов</a>
+<h1 data-th-text="${event.title}"></h1>
+<ul>
+    <li><strong>ID</strong>: <span data-th-text="${event.id}"></span></li>
+    <li><strong>Название</strong>: <span data-th-text="${event.title}"></span></li>
+    <li><strong>Дата</strong>: <span data-th-text="${event.date}"></span></li>
+    <li><strong>Цена билета</strong>: <span data-th-text="${event.ticketPrice}"></span></li>
+</ul>
+<a data-th-href="@{/events/{eventId}/edit(eventId=${event.id})}">Изменить</a>
+<form method="post" data-th-action="@{/events/{eventId}/delete(eventId=${event.id})}">
+    <button type="submit">Удалить</button>
+</form>
+</body>
+</html>

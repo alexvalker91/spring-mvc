@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ивенты</title>
+</head>
+<body>
+<a data-th-href="@{/events/main/page}">&larr; К Основной Странице Ивентов</a>
+<h1>Новый Ивент</h1>
+<div data-th-if="${errors}">
+    <h2>Допущены ошибки</h2>
+    <ul>
+        <li data-th-each="error: ${errors}" data-th-text="${error}"></li>
+    </ul>
+</div>
+<form method="post" data-th-action="@{/events/create}">
+    <label>
+        Id:<br>
+        <input type="number" name="id" data-th-value="${payload?.id}">
+    </label><br>
+    <label>
+        Title:<br>
+        <input type="text" name="title" data-th-value="${payload?.title}">
+    </label><br>
+    <label>
+        Date:<br>
+        <input type="text" name="date" data-th-value="${payload?.date}">
+    </label><br>
+    <label>
+        TicketPrice:<br>
+        <input type="number" name="ticketPrice" data-th-value="${payload?.ticketPrice}">
+    </label><br>
+    <button type="submit">Создать</button>
+</form>
+</body>
+</html>
