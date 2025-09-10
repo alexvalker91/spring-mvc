@@ -6,3 +6,78 @@
 </head>
 <body>
 <a data-th-href="@{/events/main/page}">&larr; К Основной Странице Ивентов</a>
+<h2>Поиск по названию</h2>
+<form method="get" data-th-action="@{/events/list/by-title}" id="byTitleForm">
+    <div>
+        <label>Название:
+            <input type="text" name="title" id="titleInput" data-th-value="${title}">
+        </label>
+    </div>
+    <div>
+        <label>pageSize:
+            <input type="number" name="pageSize" id="titlePageSize" min="0" data-th-value="${pageSize}">
+        </label>
+    </div>
+    <div>
+        <label>pageNum:
+            <input type="number" name="pageNum" id="titlePageNum" min="0" data-th-value="${pageNum}">
+        </label>
+    </div>
+    <button type="submit">Искать</button>
+    <div style="color: red;" data-th-if="${errors}" data-th-text="${errors}"></div>
+    <hr>
+</form>
+
+<div data-th-if="${eventsByTitle}">
+    <h3>Результаты поиска по названию</h3>
+    <ul>
+        <li data-th-each="ev : ${eventsByTitle}">
+            <a data-th-href="@{/events/{id}(id=${ev.id})}" data-th-text="${ev.title}"></a>
+            <span> | </span>
+            <span data-th-text="${ev.date}"></span>
+            <span> | </span>
+            <span data-th-text="${ev.ticketPrice}"></span>
+        </li>
+    </ul>
+    <hr>
+    <div data-th-if="${#lists.isEmpty(eventsByTitle)}">Ничего не найдено.</div>
+    <hr>
+</div>
+
+<h2>Поиск по дате</h2>
+<form method="get" data-th-action="@{/events/list/by-day}" id="byDayForm">
+    <div>
+        <label>День:
+            <input type="date" name="day" id="dayInput" data-th-value="${dayInput}">
+        </label>
+    </div>
+    <div>
+        <label>pageSize:
+            <input type="number" name="pageSize" id="dayPageSize" min="0" data-th-value="${pageSize}">
+        </label>
+    </div>
+    <div>
+        <label>pageNum:
+            <input type="number" name="pageNum" id="dayPageNum" min="0" data-th-value="${pageNum}">
+        </label>
+    </div>
+    <button type="submit">Искать</button>
+    <div style="color: red;" data-th-if="${errors}" data-th-text="${errors}"></div>
+    <hr>
+</form>
+
+<div data-th-if="${eventsByDay}">
+    <h3>Результаты поиска по дате</h3>
+    <ul>
+        <li data-th-each="ev : ${eventsByDay}">
+            <a data-th-href="@{/events/{id}(id=${ev.id})}" data-th-text="${ev.title}"></a>
+            <span> | </span>
+            <span data-th-text="${ev.date}"></span>
+            <span> | </span>
+            <span data-th-text="${ev.ticketPrice}"></span>
+        </li>
+    </ul>
+    <div data-th-if="${#lists.isEmpty(eventsByDay)}">Ничего не найдено.</div>
+</div>
+</body>
+</html>

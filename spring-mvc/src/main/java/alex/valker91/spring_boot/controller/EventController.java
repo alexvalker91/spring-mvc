@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Controller
 @RequestMapping(("events"))
@@ -95,5 +96,38 @@ public class EventController {
             model.addAttribute("errors", exception.getErrors());
             return "events/edit";
         }
+    }
+
+    @GetMapping("list/by-title")
+    public String getEventsByTitle(@RequestParam("title") String title,
+                                   @RequestParam("pageSize") int pageSize,
+                                   @RequestParam("pageNum") int pageNum,
+                                   Model model) {
+        model.addAttribute("title", title);
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("pageNum", pageNum);
+        model.addAttribute("eventsByTitle", bookingFacade.getEventsByTitle(title, pageSize, pageNum));
+        return "events/list_events";
+    }
+
+    @GetMapping("list/by-day")
+    public String getEventsForDay(@RequestParam("day") String day,
+                                  @RequestParam("pageSize") int pageSize,
+                                  @RequestParam("pageNum") int pageNum,
+                                  Model model,
+                                  HttpServletResponse response) {
+        try {
+            SimpleDateFormat dayFormatter = new SimpleDateFormat("yyyy-MM-dd");
+            Date parsedDay = dayFormatter.parse(day);
+            model.addAttribute("dayInput", day);
+            model.addAttribute("pageSize", pageSize);
+            model.addAttribute("pageNum", pageNum);
+            model.addAttribute("eventsByDay", bookingFacade.getEventsForDay(parsedDay, pageSize, pageNum));
+        } catch (ParseException e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("errors", e.getMessage());
+            model.addAttribute("dayInput", day);
+        }
+        return "events/list_events";
     }
 }
