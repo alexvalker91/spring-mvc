@@ -1,20 +1,34 @@
 package alex.valker91.spring_boot.facade.impl;
 
+import alex.valker91.spring_boot.oxm.TicketXml;
+import alex.valker91.spring_boot.oxm.TicketsXml;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
 import alex.valker91.spring_boot.facade.BookingFacade;
 import alex.valker91.spring_boot.model.Event;
 import alex.valker91.spring_boot.model.Ticket;
 import alex.valker91.spring_boot.model.User;
 import alex.valker91.spring_boot.model.UserAccount;
+
 import alex.valker91.spring_boot.service.EventService;
 import alex.valker91.spring_boot.service.TicketService;
 import alex.valker91.spring_boot.service.UserAccountService;
 import alex.valker91.spring_boot.service.UserService;
+import org.springframework.core.io.Resource;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Date;
 import java.util.List;
+import javax.xml.transform.stream.StreamSource;
 
 public class BookingFacadeImpl implements BookingFacade {
+
+    private static final Logger LOGGER = LogManager.getLogger(BookingFacadeImpl.class);
 
     private final EventService eventService;
 
@@ -24,14 +38,21 @@ public class BookingFacadeImpl implements BookingFacade {
 
     private final UserAccountService userAccountService;
 
+    private final Jaxb2Marshaller ticketsMarshaller;
+    private final TransactionTemplate transactionTemplate;
+
     public BookingFacadeImpl(EventService eventService,
                              TicketService ticketService,
                              UserService userService,
-                             UserAccountService userAccountService) {
+                             UserAccountService userAccountService,
+                             Jaxb2Marshaller ticketsMarshaller,
+                             TransactionTemplate transactionTemplate) {
         this.eventService = eventService;
         this.ticketService = ticketService;
         this.userService = userService;
         this.userAccountService = userAccountService;
+        this.ticketsMarshaller = ticketsMarshaller;
+        this.transactionTemplate = transactionTemplate;
     }
 
     @Override
@@ -137,5 +158,38 @@ public class BookingFacadeImpl implements BookingFacade {
     @Override
     public int refillUserAccount(long userId, int amount) {
         return userAccountService.refillUserAccount(userId, amount);
+    }
+
+    @Override
+    public void preloadTickets(Resource resource) {
+        TicketsXml tickets;
+
+        try {
+            tickets = (TicketsXml) ticketsMarshaller.unmarshal(new StreamSource(resource.getInputStream()));
+        } catch (Exception e) {
+            LOGGER.log(Level.DEBUG, "Failed to book ticket for user");
+            return;
+        }
+
+        for (TicketXml t : tickets.getTickets()) {
+            try {
+                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                    @Override
+                    protected void doInTransactionWithoutResult(TransactionStatus status) {
+                        Ticket.Category category = Ticket.Category.valueOf(t.getCategory().toUpperCase());
+                        Ticket booked = ticketService.bookTicket(t.getUser(), t.getEvent(), t.getPlace(), category);
+
+                        if (booked == null) {
+                            LOGGER.log(Level.DEBUG, "Failed to book ticket for user = " + t.getUser() +
+                                    ", event=" + t.getEvent() + ", place=" + t.getPlace());
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                LOGGER.log(Level.DEBUG, "Failed to book ticket for user=" + t.getUser() +
+                        ", event=" + t.getEvent() + ", place=" + t.getPlace());
+                e.printStackTrace();
+            }
+        }
     }
 }

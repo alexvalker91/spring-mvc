@@ -3,6 +3,7 @@ package alex.valker91.spring_boot.facade;
 import alex.valker91.spring_boot.model.Event;
 import alex.valker91.spring_boot.model.Ticket;
 import alex.valker91.spring_boot.model.User;
+import org.springframework.core.io.Resource;
 
 import java.util.Date;
 import java.util.List;
@@ -140,4 +141,6 @@ public interface BookingFacade {
     boolean cancelTicket(long ticketId);
 
     int refillUserAccount(long userId, int amount);
+
+    void preloadTickets(Resource resource);
 }

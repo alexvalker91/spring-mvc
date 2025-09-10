@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 @SpringBootApplication
 public class Application implements CommandLineRunner {
@@ -24,5 +27,6 @@ public class Application implements CommandLineRunner {
         Event event = bookingFacade.getEventById(1);
         System.out.println("Title Kurami: " + event.getTitle());
         System.out.println("Hello World");
+        bookingFacade.preloadTickets(new ClassPathResource("tickets1.xml"));
     }
 }
