@@ -6,3 +6,117 @@
 </head>
 <body>
 <a data-th-href="@{/events/main/page}">&larr; К Основной Странице Ивентов</a>
+
+<h2>Поиск по названию</h2>
+<form method="get" data-th-action="@{/events/list/by-title}" id="byTitleForm">
+    <div>
+        <label>Название:
+            <input type="text" name="title" id="titleInput" data-th-value="${title}">
+        </label>
+    </div>
+    <div>
+        <label>pageSize:
+            <input type="number" name="pageSize" id="titlePageSize" min="1" data-th-value="${pageSize}">
+        </label>
+    </div>
+    <div>
+        <label>pageNum:
+            <input type="number" name="pageNum" id="titlePageNum" min="1" data-th-value="${pageNum}">
+        </label>
+    </div>
+    <button type="submit" id="byTitleSubmit" disabled>Искать</button>
+    <div style="color: red;" data-th-if="${errors}" data-th-text="${errors}"></div>
+    <hr>
+</form>
+
+<div data-th-if="${eventsByTitle}">
+    <h3>Результаты поиска по названию</h3>
+    <ul>
+        <li data-th-each="ev : ${eventsByTitle}">
+            <a data-th-href="@{/events/{id}(id=${ev.id})}" data-th-text="${ev.title}"></a>
+            <span> | </span>
+            <span data-th-text="${ev.date}"></span>
+            <span> | </span>
+            <span data-th-text="${ev.ticketPrice}"></span>
+        </li>
+    </ul>
+    <hr>
+    <div data-th-if="${#lists.isEmpty(eventsByTitle)}">Ничего не найдено.</div>
+    <hr>
+ </div>
+
+<h2>Поиск по дате</h2>
+<form method="get" data-th-action="@{/events/list/by-day}" id="byDayForm">
+    <div>
+        <label>День:
+            <input type="date" name="day" id="dayInput" data-th-value="${dayInput}">
+        </label>
+    </div>
+    <div>
+        <label>pageSize:
+            <input type="number" name="pageSize" id="dayPageSize" min="1" data-th-value="${pageSize}">
+        </label>
+    </div>
+    <div>
+        <label>pageNum:
+            <input type="number" name="pageNum" id="dayPageNum" min="1" data-th-value="${pageNum}">
+        </label>
+    </div>
+    <button type="submit" id="byDaySubmit" disabled>Искать</button>
+    <div style="color: red;" data-th-if="${errors}" data-th-text="${errors}"></div>
+    <hr>
+</form>
+
+<div data-th-if="${eventsByDay}">
+    <h3>Результаты поиска по дате</h3>
+    <ul>
+        <li data-th-each="ev : ${eventsByDay}">
+            <a data-th-href="@{/events/{id}(id=${ev.id})}" data-th-text="${ev.title}"></a>
+            <span> | </span>
+            <span data-th-text="${ev.date}"></span>
+            <span> | </span>
+            <span data-th-text="${ev.ticketPrice}"></span>
+        </li>
+    </ul>
+    <div data-th-if="${#lists.isEmpty(eventsByDay)}">Ничего не найдено.</div>
+</div>
+
+<script>
+    (function () {
+        function setDisabled(buttonId, disabled) {
+            var btn = document.getElementById(buttonId);
+            if (btn) { btn.disabled = disabled; }
+        }
+
+        function checkByTitle() {
+            var title = document.getElementById('titleInput').value.trim();
+            var ps = document.getElementById('titlePageSize').value;
+            var pn = document.getElementById('titlePageNum').value;
+            var ok = title.length > 0 && Number(ps) > 0 && Number(pn) > 0;
+            setDisabled('byTitleSubmit', !ok);
+        }
+
+        function checkByDay() {
+            var day = document.getElementById('dayInput').value;
+            var ps = document.getElementById('dayPageSize').value;
+            var pn = document.getElementById('dayPageNum').value;
+            var ok = day && Number(ps) > 0 && Number(pn) > 0;
+            setDisabled('byDaySubmit', !ok);
+        }
+
+        ['titleInput','titlePageSize','titlePageNum'].forEach(function(id){
+            var el = document.getElementById(id);
+            if (el) { el.addEventListener('input', checkByTitle); }
+        });
+        ['dayInput','dayPageSize','dayPageNum'].forEach(function(id){
+            var el = document.getElementById(id);
+            if (el) { el.addEventListener('input', checkByDay); }
+        });
+
+        // initial state on load
+        checkByTitle();
+        checkByDay();
+    })();
+</script>
+</body>
+</html>
