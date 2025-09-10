@@ -140,4 +140,9 @@ public interface BookingFacade {
     boolean cancelTicket(long ticketId);
 
     int refillUserAccount(long userId, int amount);
+
+    /**
+     * Loads tickets from a predefined XML location and books them in a single batch transaction.
+     */
+    void preloadTickets();
 }

@@ -1,6 +1,11 @@
 package alex.valker91.spring_boot.facade.impl;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import alex.valker91.spring_boot.facade.BookingFacade;
 import alex.valker91.spring_boot.model.Event;
 import alex.valker91.spring_boot.model.Ticket;
@@ -10,9 +15,14 @@ import alex.valker91.spring_boot.service.EventService;
 import alex.valker91.spring_boot.service.TicketService;
 import alex.valker91.spring_boot.service.UserAccountService;
 import alex.valker91.spring_boot.service.UserService;
+import alex.valker91.spring_boot.xml.TicketXml;
+import alex.valker91.spring_boot.xml.TicketsXml;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+
+import javax.xml.transform.stream.StreamSource;
 
 public class BookingFacadeImpl implements BookingFacade {
 
@@ -24,14 +34,22 @@ public class BookingFacadeImpl implements BookingFacade {
 
     private final UserAccountService userAccountService;
 
+    private final TransactionTemplate transactionTemplate;
+
+    private final Unmarshaller unmarshaller;
+
     public BookingFacadeImpl(EventService eventService,
                              TicketService ticketService,
                              UserService userService,
-                             UserAccountService userAccountService) {
+                             UserAccountService userAccountService,
+                             TransactionTemplate transactionTemplate,
+                             Jaxb2Marshaller jaxb2Marshaller) {
         this.eventService = eventService;
         this.ticketService = ticketService;
         this.userService = userService;
         this.userAccountService = userAccountService;
+        this.transactionTemplate = transactionTemplate;
+        this.unmarshaller = jaxb2Marshaller;
     }
 
     @Override
@@ -137,5 +155,24 @@ public class BookingFacadeImpl implements BookingFacade {
     @Override
     public int refillUserAccount(long userId, int amount) {
         return userAccountService.refillUserAccount(userId, amount);
+    }
+
+    @Override
+    public void preloadTickets() {
+        ClassPathResource resource = new ClassPathResource("tickets.xml");
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(org.springframework.transaction.TransactionStatus status) {
+                try (InputStream is = resource.getInputStream()) {
+                    TicketsXml ticketsXml = (TicketsXml) unmarshaller.unmarshal(new StreamSource(is));
+                    for (TicketXml t : ticketsXml.getTickets()) {
+                        ticketService.bookTicket(t.getUserId(), t.getEventId(), t.getPlace(), t.getCategory());
+                    }
+                } catch (Exception e) {
+                    status.setRollbackOnly();
+                    throw new RuntimeException("Failed to preload tickets from XML", e);
+                }
+            }
+        });
     }
 }
