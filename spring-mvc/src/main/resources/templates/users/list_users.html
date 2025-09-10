@@ -5,4 +5,40 @@
     <title>Список пользователей</title>
 </head>
 <body>
-<a data-th-href="@{/users/main/page}">&larr; К Основной Странице Ивентов</a>
+<a data-th-href="@{/users/main/page}">&larr; К Основной Странице Пользователей</a>
+
+<h2>Поиск пользователей по имени</h2>
+<form method="get" data-th-action="@{/users/list/by-name}" id="byNameForm">
+    <div>
+        <label>Имя:
+            <input type="text" name="name" id="nameInput" data-th-value="${name}">
+        </label>
+    </div>
+    <div>
+        <label>pageSize:
+            <input type="number" name="pageSize" id="namePageSize" min="0" data-th-value="${pageSize}">
+        </label>
+    </div>
+    <div>
+        <label>pageNum:
+            <input type="number" name="pageNum" id="namePageNum" min="0" data-th-value="${pageNum}">
+        </label>
+    </div>
+    <button type="submit">Искать</button>
+    <div style="color: red;" data-th-if="${errors}" data-th-text="${errors}"></div>
+    <hr>
+</form>
+
+<div data-th-if="${usersByName}">
+    <h3>Результаты поиска</h3>
+    <ul>
+        <li data-th-each="u : ${usersByName}">
+            <a data-th-href="@{/users/{id}(id=${u.id})}" data-th-text="${u.name}"></a>
+            <span> | </span>
+            <span data-th-text="${u.email}"></span>
+        </li>
+    </ul>
+    <hr>
+    <div data-th-if="${#lists.isEmpty(usersByName)}">Ничего не найдено.</div>
+    <hr>
+</div>
