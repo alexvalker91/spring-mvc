@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Отмена билета</title>
+</head>
+<body>
+<a data-th-href="@{/tickets/main/page}">&larr; К Основной Странице Билетов</a>
+<h1>Отменить билет</h1>
+
+<div data-th-if="${result != null}">
+    <h2 data-th-if="${result}">Билет с ID <span data-th-text="${ticketId}"></span> успешно отменен.</h2>
+    <h2 data-th-unless="${result}">Не удалось отменить билет с ID <span data-th-text="${ticketId}"></span>.</h2>
+  </div>
+
+<form method="post" data-th-action="@{/tickets/cancel}">
+    <label>
+        Ticket ID:<br>
+        <input type="number" name="ticketId" required data-th-value="${ticketId}">
+    </label><br>
+    <button type="submit">Отменить</button>
+  </form>
+</body>
+</html>
