@@ -25,7 +25,6 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("Hello World");
         Event event = bookingFacade.getEventById(1);
-        System.out.println("Title Kurami: " + event.getTitle());
         System.out.println("Hello World");
         bookingFacade.preloadTickets(new ClassPathResource("tickets1.xml"));
     }
