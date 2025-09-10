@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Билеты</title>
+    
+</head>
+<body>
+    <a data-th-href="@{/tickets/main/page}">&larr; К Основной Странице Билетов</a>
+    <h1>Новый Билет</h1>
+
+    <div data-th-if="${errors}">
+        <h2>Допущены ошибки</h2>
+        <ul>
+            <li data-th-each="error: ${errors}" data-th-text="${error}"></li>
+        </ul>
+    </div>
+
+    <div data-th-if="${ticket}">
+        <h2>Билет успешно забронирован</h2>
+        <p>Идентификатор билета: <span data-th-text="${ticket.id}"></span></p>
+    </div>
+
+    <form method="post" data-th-action="@{/tickets/create}">
+        <label>
+            User ID:<br>
+            <input type="number" name="userId" data-th-value="${payload?.userId}">
+        </label><br>
+        <label>
+            Event ID:<br>
+            <input type="number" name="eventId" data-th-value="${payload?.eventId}">
+        </label><br>
+        <label>
+            Place:<br>
+            <input type="number" name="place" data-th-value="${payload?.place}">
+        </label><br>
+        <label>
+            Category:<br>
+            <select name="category">
+                <option value="STANDARD" data-th-selected="${payload?.category} == T(alex.valker91.spring_boot.model.Ticket).Category.STANDARD">STANDARD</option>
+                <option value="PREMIUM" data-th-selected="${payload?.category} == T(alex.valker91.spring_boot.model.Ticket).Category.PREMIUM">PREMIUM</option>
+                <option value="BAR" data-th-selected="${payload?.category} == T(alex.valker91.spring_boot.model.Ticket).Category.BAR">BAR</option>
+            </select>
+        </label><br>
+        <button type="submit">Забронировать</button>
+    </form>
+</body>
+</html>
