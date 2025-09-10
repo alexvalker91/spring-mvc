@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Список билетов по событию</title>
+</head>
+<body>
+<a data-th-href="@{/tickets/main/page}">&larr; К Основной Странице Билетов</a>
+<h1>Список билетов по событию</h1>
+
+<div data-th-if="${errors}">
+    <h2>Ошибка</h2>
+    <p data-th-text="${errors}"></p>
+    <hr>
+</div>
+
+<form method="get" data-th-action="@{/tickets/list/by-event}">
+    <fieldset>
+        <legend>Данные события</legend>
+        <label>
+            Event ID:<br>
+            <input type="number" name="eventId" required data-th-value="${eventId}">
+        </label><br>
+        <label>
+            Title:<br>
+            <input type="text" name="title" required data-th-value="${title}">
+        </label><br>
+        <label>
+            Date (yyyy-MM-dd HH:mm:ss):<br>
+            <input type="text" name="date" placeholder="2025-01-31 18:30:00" required data-th-value="${date}">
+        </label><br>
+        <label>
+            Ticket Price:<br>
+            <input type="number" name="ticketPrice" required data-th-value="${ticketPrice}">
+        </label><br>
+    </fieldset>
+
+    <fieldset>
+        <legend>Пагинация</legend>
+        <label>
+            pageSize:<br>
+            <input type="number" name="pageSize" min="0" value="5" data-th-value="${pageSize}">
+        </label><br>
+        <label>
+            pageNum:<br>
+            <input type="number" name="pageNum" min="0" value="0" data-th-value="${pageNum}">
+        </label><br>
+    </fieldset>
+
+    <button type="submit">Получить билеты</button>
+</form>
+
+<hr>
+
+<div data-th-if="${ticketsByEvent}">
+    <h2>Найденные билеты</h2>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Event ID</th>
+            <th>Place</th>
+            <th>Category</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-th-each="t : ${ticketsByEvent}">
+            <td data-th-text="${t.id}"></td>
+            <td data-th-text="${t.userId}"></td>
+            <td data-th-text="${t.eventId}"></td>
+            <td data-th-text="${t.place}"></td>
+            <td data-th-text="${t.category}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div data-th-if="${#lists.isEmpty(ticketsByEvent)}">
+        <p>Билеты не найдены.</p>
+    </div>
+    <hr>
+</div>
+
+</body>
+</html>

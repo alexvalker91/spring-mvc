@@ -2,7 +2,9 @@ package alex.valker91.spring_boot.controller;
 
 import alex.valker91.spring_boot.controller.payload.NewTicketPayload;
 import alex.valker91.spring_boot.facade.BookingFacade;
+import alex.valker91.spring_boot.model.Event;
 import alex.valker91.spring_boot.model.Ticket;
+import alex.valker91.spring_boot.model.impl.EventImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 @Controller
 @RequestMapping(("tickets"))
@@ -32,7 +39,7 @@ public class TicketController {
 
     @GetMapping("list")
     public String getListTicketsPage() {
-        return "users/list_tickets";
+        return "tickets/list_tickets";
     }
 
     @PostMapping("create")
@@ -69,5 +76,41 @@ public class TicketController {
         model.addAttribute("ticketId", ticketId);
         model.addAttribute("result", result);
         return "tickets/cancel_ticket";
+    }
+
+    @GetMapping("list/by-event")
+    public String getTicketsByEvent(@RequestParam("eventId") long eventId,
+                                    @RequestParam("title") String title,
+                                    @RequestParam("date") String date,
+                                    @RequestParam("ticketPrice") int ticketPrice,
+                                    @RequestParam("pageSize") int pageSize,
+                                    @RequestParam("pageNum") int pageNum,
+                                    Model model,
+                                    HttpServletResponse response) {
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date parsedDate = formatter.parse(date);
+            Event event = new EventImpl(eventId, title, parsedDate, ticketPrice);
+
+            List<Ticket> tickets = bookingFacade.getBookedTickets(event, pageSize, pageNum);
+
+            model.addAttribute("eventId", eventId);
+            model.addAttribute("title", title);
+            model.addAttribute("date", date);
+            model.addAttribute("ticketPrice", ticketPrice);
+            model.addAttribute("pageSize", pageSize);
+            model.addAttribute("pageNum", pageNum);
+            model.addAttribute("ticketsByEvent", tickets);
+        } catch (ParseException e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            model.addAttribute("errors", e.getMessage());
+            model.addAttribute("eventId", eventId);
+            model.addAttribute("title", title);
+            model.addAttribute("date", date);
+            model.addAttribute("ticketPrice", ticketPrice);
+            model.addAttribute("pageSize", pageSize);
+            model.addAttribute("pageNum", pageNum);
+        }
+        return "tickets/list_tickets";
     }
 }
