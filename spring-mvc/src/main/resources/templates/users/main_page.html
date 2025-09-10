@@ -6,6 +6,7 @@
 </head>
 <body>
 <a data-th-href="@{/users/create}">+ Создать пользователя</a>
+<a data-th-href="@{/users/list}">+ Получение списка пользователей</a>
 <form method="get" data-th-action="@{/users/userbyemail}">
     <label>Фильтр:<input type="text" name="filter" data-th-value="${filter}">
         <button type="submit">Поиск</button>

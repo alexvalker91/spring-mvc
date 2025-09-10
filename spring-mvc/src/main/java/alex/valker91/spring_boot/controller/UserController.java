@@ -29,6 +29,11 @@ public class UserController {
         return "users/new_user";
     }
 
+    @GetMapping("list")
+    public String getListUsersPage() {
+        return "events/list_users";
+    }
+
     @PostMapping("create")
     public String createUser(NewUserPayload payload,
                               Model model,
