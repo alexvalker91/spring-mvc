@@ -32,6 +32,11 @@ public class EventController {
         return "events/new_event";
     }
 
+    @GetMapping("list")
+    public String getListEventPage() {
+        return "events/list_events";
+    }
+
     @PostMapping("create")
     public String createEvent(NewEventPayload payload,
                               Model model,
