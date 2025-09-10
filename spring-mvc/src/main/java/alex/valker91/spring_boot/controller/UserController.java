@@ -31,7 +31,7 @@ public class UserController {
 
     @GetMapping("list")
     public String getListUsersPage() {
-        return "events/list_users";
+        return "users/list_users";
     }
 
     @PostMapping("create")
@@ -97,5 +97,17 @@ public class UserController {
         model.addAttribute("user", user);
         model.addAttribute("filter", filter);
         return "users/userbyemail";
+    }
+
+    @GetMapping("list/by-name")
+    public String getUsersByName(@RequestParam("name") String name,
+                                 @RequestParam("pageSize") int pageSize,
+                                 @RequestParam("pageNum") int pageNum,
+                                 Model model) {
+        model.addAttribute("name", name);
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("pageNum", pageNum);
+        model.addAttribute("usersByName", bookingFacade.getUsersByName(name, pageSize, pageNum));
+        return "users/list_users";
     }
 }
