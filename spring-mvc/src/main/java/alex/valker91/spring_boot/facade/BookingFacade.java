@@ -140,4 +140,10 @@ public interface BookingFacade {
     boolean cancelTicket(long ticketId);
 
     int refillUserAccount(long userId, int amount);
+
+    /**
+     * Batch-preload tickets from a predefined XML file using Spring OXM.
+     * The entire import runs within a single programmatic transaction.
+     */
+    void preloadTickets();
 }

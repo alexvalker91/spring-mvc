@@ -6,13 +6,22 @@ import alex.valker91.spring_boot.model.Event;
 import alex.valker91.spring_boot.model.Ticket;
 import alex.valker91.spring_boot.model.User;
 import alex.valker91.spring_boot.model.UserAccount;
+import alex.valker91.spring_boot.oxm.TicketXml;
+import alex.valker91.spring_boot.oxm.TicketsXml;
 import alex.valker91.spring_boot.service.EventService;
 import alex.valker91.spring_boot.service.TicketService;
 import alex.valker91.spring_boot.service.UserAccountService;
 import alex.valker91.spring_boot.service.UserService;
+import org.springframework.core.io.Resource;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import javax.xml.transform.stream.StreamSource;
 
 public class BookingFacadeImpl implements BookingFacade {
 
@@ -27,11 +36,17 @@ public class BookingFacadeImpl implements BookingFacade {
     public BookingFacadeImpl(EventService eventService,
                              TicketService ticketService,
                              UserService userService,
-                             UserAccountService userAccountService) {
+                             UserAccountService userAccountService,
+                             Jaxb2Marshaller ticketsMarshaller,
+                             TransactionTemplate transactionTemplate,
+                             Resource defaultTicketsResource) {
         this.eventService = eventService;
         this.ticketService = ticketService;
         this.userService = userService;
         this.userAccountService = userAccountService;
+        this.ticketsMarshaller = ticketsMarshaller;
+        this.transactionTemplate = transactionTemplate;
+        this.defaultTicketsResource = defaultTicketsResource;
     }
 
     @Override
@@ -137,5 +152,39 @@ public class BookingFacadeImpl implements BookingFacade {
     @Override
     public int refillUserAccount(long userId, int amount) {
         return userAccountService.refillUserAccount(userId, amount);
+    }
+
+    private final Jaxb2Marshaller ticketsMarshaller;
+    private final TransactionTemplate transactionTemplate;
+    private final Resource defaultTicketsResource;
+
+    @Override
+    public void preloadTickets() {
+        preloadTickets(null);
+    }
+
+    // optional overload to accept custom resource
+    private void preloadTickets(Resource overrideResource) {
+        final Resource resourceToUse = Objects.requireNonNullElse(overrideResource, defaultTicketsResource);
+
+        TicketsXml tickets;
+        try {
+            tickets = (TicketsXml) ticketsMarshaller.unmarshal(new StreamSource(resourceToUse.getInputStream()));
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Failed to read tickets XML resource", e);
+        }
+
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                for (TicketXml t : tickets.getTickets()) {
+                    Ticket.Category category = Ticket.Category.valueOf(t.getCategory().toUpperCase());
+                    Ticket booked = ticketService.bookTicket(t.getUser(), t.getEvent(), t.getPlace(), category);
+                    if (booked == null) {
+                        throw new IllegalStateException("Failed to book ticket for user=" + t.getUser() + ", event=" + t.getEvent() + ", place=" + t.getPlace());
+                    }
+                }
+            }
+        });
     }
 }
