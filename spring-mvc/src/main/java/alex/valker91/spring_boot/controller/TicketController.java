@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping(("tickets"))
@@ -54,5 +55,19 @@ public class TicketController {
             model.addAttribute("errors", exception.getMessage());
             return "tickets/new_ticket";
         }
+    }
+
+    @GetMapping("cancel")
+    public String getCancelTicketPage() {
+        return "tickets/cancel_ticket";
+    }
+
+    @PostMapping("cancel")
+    public String cancelTicket(@RequestParam("ticketId") long ticketId,
+                               Model model) {
+        boolean result = bookingFacade.cancelTicket(ticketId);
+        model.addAttribute("ticketId", ticketId);
+        model.addAttribute("result", result);
+        return "tickets/cancel_ticket";
     }
 }
