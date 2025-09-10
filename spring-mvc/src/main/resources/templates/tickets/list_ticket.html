@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Список билетов пользователя</title>
+</head>
+<body>
+<a data-th-href="@{/tickets/main/page}">&larr; К Основной Странице Билетов</a>
+<h1>Список билетов пользователя (PDF)</h1>
+
+<p>Эта форма отправляет запрос, который запрашивает PDF-версию списка билетов по заголовку Accept.</p>
+
+<form method="get" data-th-action="@{/tickets/list/by-user}">
+    <fieldset>
+        <legend>Данные пользователя</legend>
+        <label>
+            User ID:<br>
+            <input type="number" name="userId" required>
+        </label><br>
+        <label>
+            Name:<br>
+            <input type="text" name="name" required>
+        </label><br>
+        <label>
+            Email:<br>
+            <input type="email" name="email" required>
+        </label><br>
+    </fieldset>
+
+    <fieldset>
+        <legend>Пагинация</legend>
+        <label>
+            pageSize:<br>
+            <input type="number" name="pageSize" min="1" value="5">
+        </label><br>
+        <label>
+            pageNum:<br>
+            <input type="number" name="pageNum" min="1" value="1">
+        </label><br>
+    </fieldset>
+
+    <button type="submit" formaction="#" onclick="submitPdf(event)">Скачать PDF</button>
+</form>
+
+<script>
+    function submitPdf(event) {
+        event.preventDefault();
+        const form = event.target.form;
+        const url = form.getAttribute('action') || form.getAttribute('data-th-action');
+        const params = new URLSearchParams(new FormData(form));
+        const requestUrl = url + '?' + params.toString();
+        const link = document.createElement('a');
+        link.href = requestUrl;
+        link.setAttribute('download', 'booked-tickets.pdf');
+        // Use fetch to set Accept header then trigger blob download
+        fetch(requestUrl, { headers: { 'Accept': 'application/pdf' } })
+            .then(r => r.blob())
+            .then(blob => {
+                const objectUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = objectUrl;
+                a.download = 'booked-tickets.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(objectUrl);
+            });
+    }
+</script>
+
+</body>
+</html>

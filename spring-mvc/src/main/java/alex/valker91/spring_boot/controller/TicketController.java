@@ -7,7 +7,10 @@ import alex.valker91.spring_boot.model.Ticket;
 import alex.valker91.spring_boot.model.impl.EventImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -112,5 +116,25 @@ public class TicketController {
             model.addAttribute("pageNum", pageNum);
         }
         return "tickets/list_tickets";
+    }
+
+    @GetMapping(value = "list/by-user", produces = MediaType.TEXT_HTML_VALUE)
+    public String getListTicketsByUserPage() {
+        return "tickets/list_ticket";
+    }
+
+    @GetMapping(value = "list/by-user", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> downloadTicketsByUserAsPdf(@RequestParam("userId") long userId,
+                                                             @RequestParam("name") String name,
+                                                             @RequestParam("email") String email,
+                                                             @RequestParam("pageSize") int pageSize,
+                                                             @RequestParam("pageNum") int pageNum) {
+        String base64Pdf = "";
+        byte[] pdfBytes = Base64.getDecoder().decode(base64Pdf);
+        String filename = "booked-tickets-user-" + userId + ".pdf";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
     }
 }
